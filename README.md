@@ -1,1 +1,1 @@
-# ME6
+# ME6 : Multiple Ethernet - IPv6 address mapping
