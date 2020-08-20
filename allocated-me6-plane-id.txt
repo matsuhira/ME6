@@ -1,0 +1,8 @@
+me6 plane id (16bit)
+----------------------------
+
+plane id value (Hex)      allocate to                   contact         allocated date
+0000 - 0000             Reserved                        matsuhira       2020/8/20
+0001 - FEFF             Reserved
+FF00 - FFEF
+FFF0 - FFFF             for tempolary / test use        matsuhira       2020/8/20
