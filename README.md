@@ -7,7 +7,8 @@ ME6 enables LAN extension using IPv6 by address mapping technology from MAC addr
 
 * more info (Japanese)<br>
 https://github.com/matsuhira/ME6/blob/master/about_me6.md<br>
-
+* more info (English)<br>
+https://github.com/matsuhira/ME6/blob/master/about_me6_en.md
 
 ## spec
 https://tools.ietf.org/html/draft-matsuhira-me6a<br>
