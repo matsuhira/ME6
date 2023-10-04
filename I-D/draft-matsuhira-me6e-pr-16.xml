@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-me6e-pr-16" ipr="trust200902">
+  <front>
+    <title abbrev="ME6E-PR">Multiple Ethernet - IPv6 address mapping
+    encapsulation - prefix resolution</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>WIDE Project</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>naoki.matsuhira@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="3" month="October" year="2023"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>Ethernet</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple Ethernet - IPv6 address mapping
+      encapsulation - Prefix Resolution (ME6E-PR) specification. ME6E-PR makes
+      expantion ethernet network over IPv6 backbone network with encapsuation
+      technoogy. And also, E6ME-PR can stack multiple Ethernet networks.
+      ME6E-PR work on non own routing domain.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>This document provide Multiple Ethernet - IPv6 address mapping
+      encapsulation - Prefix Resolution (ME6E-PR) specification.</t>
+
+      <t>ME6E-PR make many virtual ethernet network over IPv6 network with
+      unicast base technology.</t>
+
+      <t>ME6E-PR can use on both own routing domain and non own routing
+      domain, i.e. can or cannot advertise routes to the network.</t>
+
+      <t/>
+
+      <t/>
+    </section>
+
+    <section title="Basic Network Configuration">
+      <t><xref target="Fig-network-configuration"/> shows network
+      configuration with ME6E-PR. The network consists of three parts,
+      backbone network, nodes (host or router), and ME6E-PR.</t>
+
+      <t>Backbone network can be operated with dual stack or IPv6 only. Node
+      may physical node or virtual node, and have Ethernet Interface.</t>
+
+      <t>ME6E-PR connects IPv6 network and nodes. ME6E-PR connect to node with
+      Ethernet (Layer2), and ME6E-PR connect to IPv6 network with IPv6
+      (Layer3).</t>
+
+      <t><figure anchor="Fig-network-configuration">
+          <artwork><![CDATA[/---------------------------------------------------\
+|                                                   |
+|                  IPv6 Network                     |
+|          (Dual stack or IPv6 only)                |
+|                                                   |
+\---------------------------------------------------/
+       |                             |
+   +-------+            +------------------------+
+   |E6ME-PR|            |        E6ME-PR         |
+   +-------+            +------------------------+
+       |                    |                |
+ /--------------\   /--------------\   /--------------\   
+ |              |   |              |   |              |
+ | Node         |   | Node         |   | Node         |
+ |(Host/Router) |   |(Host/Router) |   |(Host/Router) |
+ |              |   |              |   |              |
+ \--------------/   \--------------/   \--------------/
+
+
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Function of ME6E-PR">
+      <t>ME6E-PR has mainly two function.</t>
+
+      <t>One is encapsulate from Ethernet frame to IPv6 packet, and
+      decapsulate from IPv6 packet to Ethernet frame. Another is generate a
+      table where Ethernet MAC address belong to IPv6 network.</t>
+
+      <section title="Ethernet over IPv6 Encapsulation">
+        <t>ME6E-PR encapsulates Ethernet frame to IPv6 packet from node to
+        IPv6 network, and decapsulates IPv6 packet to Ethernet frame from IPv6
+        network to node. <xref target="Fig-encap-decap"/> shows frame and
+        packet format on both IPv6 network and IPv6 network.</t>
+
+        <t/>
+
+        <figure anchor="Fig-encap-decap">
+          <artwork><![CDATA[
+     +--------+------------+       +----------+--------+------------+
+     |Ethr Hdr|    Data    |  -->  | IPv6 Hdr |Ethr Hdr|    Data    |
+     +--------+------------+       +----------+--------+------------+
+
+     +--------+------------+       +----------+--------+------------+
+     |Ethr Hdr|    Data    |  <--  | IPv6 Hdr |Ethr Hdr|    Data    |
+     +--------+------------+       +----------+--------+------------+
+
+
+    /-------------------\  +----------+  /-----------------------------\
+    |   Node            |--| ME6E-PR  |--|       IPv6 Network          |
+    |(Host or Router)   |  +----------+  |(Dual stack or IPv6 only)    |
+    \-------------------/                \-----------------------------/
+
+
+]]></artwork>
+        </figure>
+
+        <t/>
+
+        <t>The value of next header field of IPv6 header is TBD. The value of
+        EtherIP(RFC3378) <xref target="RFC3378">EtherIP</xref>may used,
+        however new value for this protocol may assigned.</t>
+
+        <t>When encapsulated IPv6 Packet size exceed path MTU , ME6E-PR
+        fragment Ethernet frame, and then send them.</t>
+
+        <t/>
+      </section>
+
+      <section title="Multiple Ethernet - IPv6 mapped address (ME6A) architecture">
+        <t/>
+
+        <t>ME6A<xref target="I-D.matsuhira-me6a"/> is a IPv6 address used in
+        outer IPv6 header which encapsulate ethernet frame by ME6E-PR. <xref
+        target="Fig-SA46T-PR-addr"/> shows ME6A architecture.</t>
+
+        <t><figure anchor="Fig-SA46T-PR-addr">
+            <artwork><![CDATA[ |  96 - m -n bits          |         m bits         |     n bits     |
+ +--------------------------+------------------------+----------------+
+ |   ME6 address prefix     | Multiple net plane ID  |Ethernet address|
+ +--------------------------+------------------------+----------------+
+]]></artwork>
+          </figure></t>
+
+        <t>ME6E address consists of three parts as follows.</t>
+
+        <t/>
+
+        <t><list style="hanging">
+            <t hangText="ME6 address prefix"><vspace blankLines="1"/>ME6
+            address prefix. This value is resolved by ME6E-PR.</t>
+
+            <t hangText="Multiple network plane ID"><vspace
+            blankLines="1"/>Multiple network plane ID is an identifier of
+            Ethernet network over IPv6 backbone network. This value is
+            preconfigured depend on the ME6E-RP belong which ethernet network
+            plane. This value is just like VLAN-ID of IEEE802.1Q, tag
+            VLAN.</t>
+
+            <t hangText="EThernet address"><vspace blankLines="1"/>Ethernet
+            MAC address in inner Ethernet frame. EUI-48 address or EUI-64
+            address.</t>
+          </list></t>
+
+        <t/>
+      </section>
+
+      <section title="Resolving ME6E address">
+        <t>ME6E-PR resolve ME6 address using ME6E Prefix Resolution Table
+        (ME6E-PR Table). ME6E-PR generate ME6E-PR address resolving ME6E-PR
+        prefix from Multiple network plane ID and Ethernet MAC address. <xref
+        target="Fig-addr-resolve"/> show this processing.</t>
+
+        <t><figure anchor="Fig-addr-resolve">
+            <artwork><![CDATA[ |  96 - m -n bits          |         m bits         |     n bits     |
+ +--------------------------+------------------------+----------------+
+ |  ME6 address prefix      | Multiple net plane ID  |Ethernet address|
+ +--------------------------+------------------------+----------------+
+
+ \--------------------------/\--------------------------------------/
+            ^                                     |
+            |                                     |
+            |                                     v
+ +------------------------------------------------------------------+
+ |                                                                  |
+ |       ME6E Prefix Resolution Table (ME6E-PR Table)               |
+ |                                                                  |
+ +------------------------------------------------------------------+
+]]></artwork>
+          </figure></t>
+
+        <t><xref target="Fig-sa46t-pr-tab"/> show ME6E-PR Table. This table
+        consists four parts, Multiple network plane ID, Ehernet address,
+        netmask, and ME6 address prefix.</t>
+
+        <t><figure anchor="Fig-sa46t-pr-tab">
+            <artwork><![CDATA[   +---------------------+----------------+-------++-------------------+
+   |Multiple net plane ID|Ethernet address|netmask|| ME6 address prefix|
+   +---------------------+----------------+-------++-------------------+
+   |Multiple net plane ID|Ethernet address|netmask|| ME6 address prefix| 
+   +---------------------+----------------+-------++-------------------+
+   |Multiple net plane ID|Ethernet address|netmask|| ME6 address prefix| 
+   +---------------------+----------------+-------++-------------------+
+   |Multiple net plane ID|Ethernet address|netmask|| ME6 address prefix| 
+   +---------------------+----------------+-------++-------------------+
+                 :              :               :
+   +---------------------+----------------+-------++-------------------+
+   |Multiple net plane ID|Ethernet address|netmask|| ME6 address prefix| 
+   +---------------------+----------------+-------++-------------------+
+]]></artwork>
+          </figure></t>
+
+        <t>ME6E-PR configured multiple network plane ID, so ME6E-PR know
+        multiple network plane ID value the interface belongs.</t>
+
+        <t>Resolving destination address, ME6E-PR use pre-configured multiple
+        network plane ID valude, and destination MAC address of Ehernet frame,
+        and search the ME6E-PR table. ME6E-PR table return the ME6 address
+        prefix value correspoiding multiple network plane ID and ethernet
+        destination MAC address. Then ME6E-PR generate whole ME6 address.</t>
+
+        <t>Resolving source address, ME6E-PR already know multiple network
+        plane ID value and IPv6 address prefix as ME6 prefix. So, searching
+        the ME6E-PR table does not require for resolving source address.</t>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Sample configuration">
+      <t><xref target="Fig-sample-network"/> shows sample confiuration of
+      ME6E-PR. In this example, there are three IPv4 stub network with the
+      same IPv4 network plane.</t>
+
+      <t><figure anchor="Fig-sample-network">
+          <artwork><![CDATA[
+ /------------\  /--------------------------------------------/
+ |            |  | Stub Network #1                            |
+ |            |  |  2001:0db8:0:1::/64                        |
+ |            |  | +--------+  /----------------------------\ |
+ |            |--| |ME6E-PR|-- |00:00:00:00:00:01(plane 1)  | |
+ |            |  | +--------+  |                            | |
+ |            |  |             \----------------------------/ |
+ |           <--[2001:0db8:0:1::/64]                          |
+ |            |  /--------------------------------------------/
+ |            |
+ |            |  /--------------------------------------------/
+ |            |  | Stub Network #2                            |
+ |            |  |  2001:0db8:0:2::/64                        |
+ | Backbone   |  | +--------+  /----------------------------\ |
+ | Network    |--| |ME6E-PR|-- |00:00:00:00:00:02(plane 1)  | |
+ |            |  | +--------+  |                            | |
+ |            |  |             \----------------------------/ |
+ |           <--[2001:0db8:0:2::/64]                          |
+ |            |  /--------------------------------------------/
+ |            |
+ |            |  /--------------------------------------------/
+ |            |  | Stub Network #3                            |
+ |            |  |  2001:0db8:0:3::/64                        |
+ |            |  | +--------+  /----------------------------\ |
+ |            |--| |ME6E-PR|-- |00:00:00:00:00:03(plane 1)  | |
+ |            |  | +--------+  |                            | |
+ |            |  |             \----------------------------/ |
+ |           <--[2001:0db8:0:3::/64]                          |
+ |            |  /--------------------------------------------/
+ |            |
+ \------------/
+]]></artwork>
+        </figure></t>
+
+      <t><xref target="Fig-sample-table"/> shows ME6E-PR table for sample
+      network.</t>
+
+      <t/>
+
+      <figure anchor="Fig-sample-table">
+        <artwork><![CDATA[   +---------+-------------------+-------++----------------------+
+   | plane ID|    MAC address    |netmask||ME6E-PR address prefix|
+   +---------+-------------------+-------++----------------------+
+   |    1    | 00:00:00:00:00:01 | /128  || 2001:0db8:0:1        |
+   |    1    | 00:00:00:00:00:02 | /128  || 2001:0db8:0:2        |
+   |    1    | 00:00:00:00:00:03 | /128  || 2001:0db8:0:3        |
+   +---------+-------------------+-------++----------------------+
+   ]]></artwork>
+      </figure>
+
+      <t/>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA if using EtherIP Header.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Security Considerations does not discussed in this memo.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <reference anchor="I-D.matsuhira-me6a">
+        <front>
+          <title>Multiple Ethernet - IPv6 mapped IPv6 address (ME6A)</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization>M</organization>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+    </references>
+
+    <references title="Informative References">
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.3378.xml'?>
+    </references>
+
+    <?rfc ?>
+  </back>
+</rfc>
