@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-matsuhira-me6e-fp-18" ipr="trust200902">
+  <front>
+    <title abbrev="ME6E-FP">Multiple Ethernet - IPv6 address mapping
+    encapsulation - fixed prefix</title>
+
+    <author fullname="Naoki Matsuhira" initials="N." surname="Matsuhira">
+      <organization>Neptela</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <code/>
+
+          <region/>
+
+          <country>Japan</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>matsuhira.ietf@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="7" month="October" year="2024"/>
+
+    <area/>
+
+    <workgroup/>
+
+    <keyword>IPv6</keyword>
+
+    <keyword>Ethernet</keyword>
+
+    <abstract>
+      <t>This document specifies Multiple Ethernet - IPv6 address mapping
+      encapsulation - fixed prefix (ME6E-FP) base specification. ME6E-FP makes
+      expantion ethernet network over IPv6 backbone network with encapsuation
+      technoogy. And also, E6ME-FP can stack multiple Ethernet networks.
+      ME6E-FP work on own routing domain.</t>
+    </abstract>
+
+    <note title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section anchor="Sec-Introduction" title="Introduction">
+      <t>This document provides Multiple Ethernet - IPv6 address mapping
+      encapsulation - fixed prefix (ME6E-FP) base specification.</t>
+
+      <t>ME6E-FP make many virtual ethernet network over IPv6 network with
+      unicast base technology.</t>
+
+      <t>ME6E-FP can use on own routing domain, i.e. can advertise routes to
+      the network.</t>
+
+      <t/>
+
+      <t/>
+
+      <t/>
+    </section>
+
+    <section title="Basic Network Configuration">
+      <t><xref target="Fig-network"/> shows network configuration with
+      ME6E-FP. The network consists of three parts. IPv6 network, Nodes (Host
+      or Router) , and ME6E-FP.</t>
+
+      <t>Backbone network is operated with Dual Stack or IPv6 only. Node may
+      physical node or virtual node, and have Ethernet Interface.</t>
+
+      <t>ME6E-FP connects IPv6 network and nodes. ME6E-FP connect to node with
+      Ethernet (Layer2), and ME6E-FP connect to IPv6 network with IPv6
+      (Layer3).</t>
+
+      <t/>
+
+      <t><figure anchor="Fig-network">
+          <artwork><![CDATA[ /---------------------------------------------------\
+ |                                                   |
+ |                  IPv6  Network                    |
+ |              (Dual stack or IPv6 only)            |
+ |                                                   |
+ \---------------------------------------------------/
+       |                             |
+   +-------+            +------------------------+
+   |E6ME-FP|            |        E6ME-FP         |
+   +-------+            +------------------------+
+       |                    |                |
+ /--------------\   /--------------\   /--------------\   
+ |              |   |              |   |              |
+ | Node         |   | Node         |   | Node         |
+ |(Host/Router) |   |(Host/Router) |   |(Host/Router) |
+ |              |   |              |   |              |
+ \--------------/   \--------------/   \--------------/
+]]></artwork>
+        </figure></t>
+
+      <t/>
+    </section>
+
+    <section title="Basic Function of ME6E-FP">
+      <t>ME6E-FP has mainly two function. One is encapsulate from Ethernet
+      frame to IPv6 packet, and decapsulate from IPv6 packet to Ethernet
+      frame. Another is advertise route corresponding to Ethernet MAC
+      address.</t>
+
+      <section title="Ethernet over IPv6 Encapsulation">
+        <t/>
+
+        <t>ME6E-FP encapsulates ethernet frame to IPv6 packet from node to
+        IPv6 network, and decapsulates IPv6 packet to ethernet frame from IPv6
+        network to node. <xref target="Fig-46tun"/> shows encapsulation and
+        decapsulation of Ethernet frame and IPv6 packet</t>
+
+        <t><figure anchor="Fig-46tun">
+            <artwork><![CDATA[
+  +--------+------------+       +----------+--------+------------+
+  |Ethr Hdr|    Data    |  -->  | IPv6 Hdr |Ethr Hdr|    Data    |
+  +--------+------------+       +----------+--------+------------+
+
+  +--------+------------+       +----------+--------+------------+
+  |Ethr Hdr|    Data    |  <--  | IPv6 Hdr |Ethr Hdr|    Data    |
+  +--------+------------+       +----------+--------+------------+
+
+
+ /-------------------\  +-------+  /-----------------------------\
+ |   Node            |--|ME6E-FP|--|       IPv6 Network          |
+ | (Host or Router)  |  +-------+  |  (Dual Stack or IPv6 only)  |
+ \-------------------/             \-----------------------------/
+]]></artwork>
+          </figure></t>
+
+        <t/>
+
+        <t>The value of next header field of IPv6 header is TBD. The value of
+        <xref target="RFC3378">EtherIP</xref> may used, however new value for
+        this protocol may assigned.</t>
+
+        <t>When encapsulated IPv6 Packet size exceed path MTU , ME6E-FP
+        fragment Ethernet frame, and then send them.</t>
+
+        <t/>
+
+        <t/>
+
+        <t/>
+      </section>
+
+      <section title="Multiple Ethernet - IPv6 mapped address (ME6A) architecture">
+        <t>ME6A<xref target="I-D.matsuhira-me6a"/> is a IPv6 address used in
+        outer IPv6 header which encapsulate ethernet frame by ME6E-FP.</t>
+
+        <t><xref target="Fig-SA46Taddr-arch"/> shows ME6A architecture</t>
+
+        <t><figure anchor="Fig-SA46Taddr-arch">
+            <artwork><![CDATA[
+ |  80 - m - n bits      |          m bits          |      n bits    |
+ +-----------------------+--------------------------+----------------+
+ | ME6 address prefix    |  Multiple net plane ID   |Ethernet address|
+ +-----------------------+--------------------------+----------------+
+]]></artwork>
+          </figure></t>
+
+        <t>ME6 address consists of three parts as follows.</t>
+
+        <t><list style="hanging">
+            <t hangText="ME6 address prefix"><vspace blankLines="1"/>ME6
+            address prefix . This value is preconfigured to all ME6E-FP in the
+            IPv6 networks.</t>
+
+            <t hangText="Multiple network plane ID"><vspace
+            blankLines="1"/>Multiple network plane ID is an identifier of
+            Ethernet network over IPv6 backbone network. This value is
+            preconfigured depend on the ME6E-FP belong which ethernet network
+            plane. This value is just like VLAN-ID of IEEE802.1Q, tag
+            VLAN.</t>
+
+            <t hangText="Ethernet address"><vspace blankLines="1"/>Ethernet
+            MAC address in inner Ethernet frame. EUI-48 address or EUI-64
+            address.</t>
+          </list></t>
+
+        <t>ME6 address is resolved by copying ethernet MAC address in inner
+        ethernet frame, and preconfigured values, ME6 prefix and multiple
+        network plane ID.</t>
+      </section>
+
+      <section title="Route Advertisement">
+        <t/>
+
+        <t>ME6E-FP advertises ME6 address host route to the IPv6 network. The
+        number of the route of ME6 addresses is the same as the number of MAC
+        address table.</t>
+
+        <t/>
+
+        <t>In the IPv6 network, usual dynamic routing protocol for IPv6 can be
+        used such as <xref target="RFC2080">RIPng</xref>, <xref
+        target="RFC2740">OSPFv3</xref> and <xref target="RFC5308">IS-IS</xref>
+        .</t>
+
+        <t/>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="ME6E-FP address format">
+      <t>ME6E-FP can be used closely in the IPv6 network, so ME6 address does
+      not be advertised outside of the IPv6 network, and IPv6 packet which
+      contains ME6 address does not be forwarded outside of the backbone
+      network.</t>
+
+      <t/>
+
+      <t>So, ME6 address format and ME6 address prefix can be decided each
+      IPv6 network. Some example are shown as follows. These address is based
+      on EUI-48 MAC address. EUI-64 address is the future study.</t>
+
+      <t/>
+
+      <section title="IPv6 Global Unicast Address">
+        <t/>
+
+        <t>This example is based on <xref target="RFC3587">IPv6 Global Unicast
+        Address Format</xref>.</t>
+
+        <t><xref target="Fig-v6addr"/> shows IPv6 Global Unicast Address
+        Format.</t>
+
+        <t/>
+
+        <t/>
+
+        <t><figure anchor="Fig-v6addr">
+            <artwork><![CDATA[
+ | 3 |        45bits         |  16bits   |        64bits            |
+ +---+-----------------------+-----------+--------------------------+
+ |001| Global routing prefix | subnet id |  Interface ID            |
+ +---+-----------------------+-----------+--------------------------+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="16bits plane ID ME6 address">
+        <t><xref target="Fig-me6addr-pid16"/> shows ME6 address format with
+        16bits multiple network plane ID using part of IPv6 Global Unicast
+        Address.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-me6addr-pid16">
+            <artwork><![CDATA[
+ | 3 |        45bits         |  16bits   |   16bits  |   48bits     |
+ +---+-----------------------+-----------+--------------------------+
+ |001| Global routing prefix | subnet id |  plane ID |EUI-48 address|
+ +---+-----------------------+-----------+--------------------------+
+ <---ME6 address prefix--------------->
+]]></artwork>
+          </figure></t>
+
+        <t>Where:</t>
+
+        <t><list style="hanging">
+            <t hangText="Global routing prefix"><vspace blankLines="1"/>global
+            routing prefix</t>
+
+            <t hangText="subnet id"><vspace blankLines="1"/>indication for ME6
+            prefix.</t>
+
+            <t hangText="multiple network plane id"><vspace
+            blankLines="1"/>ethernet network plane ID.</t>
+
+            <t hangText="EUI-48 address"><vspace blankLines="1"/>EUI-48 MAC
+            address of inner ethernet frame.</t>
+          </list>16bits plane ID can represent 65535 ethernet network
+        plane.</t>
+      </section>
+
+      <section title="32bits plane ID ME6 address">
+        <t/>
+
+        <t><xref target="Fig-me6addr-pid32"/>shows ME6 address format with
+        32bits plane ID using part of IPv6 Global Unicast Address.</t>
+
+        <t/>
+
+        <t><figure anchor="Fig-me6addr-pid32">
+            <artwork><![CDATA[
+ | 3 |        45bits         |        32bits         |   48bits     |
+ +---+-----------------------+--------------------------------------+
+ |001| Global routing prefix |       plane ID        |EUI-48 address|
+ +---+-----------------------+--------------------------------------+
+ <---ME6 address prefix----->
+]]></artwork>
+          </figure></t>
+
+        <t>Where:</t>
+
+        <t><list style="hanging">
+            <t hangText="Global routing prefix"><vspace blankLines="1"/>global
+            routing prefix</t>
+
+            <t hangText="multiple network plane id"><vspace
+            blankLines="1"/>ethernet network plane ID.</t>
+
+            <t hangText="EUI-48 address"><vspace blankLines="1"/>EUI-48 MAC
+            address of inner ethernet frame</t>
+          </list>32bits plane ID can represent about 4.3 billion ethernet
+        network plane.</t>
+      </section>
+
+      <section title="mixture and renumbering of ME6 address">
+        <t>If ME6 address prefix does not overlap, ME6 address can
+        co-existing. And also, ME6 address prefix may renumber, that mean,
+        small start with 16bits plane ID ME6 address, then renumber to 32bits
+        plane ID ME6 address.</t>
+
+        <t>ME6E-FP provide flexible operation for scalability of multiple
+        network plane id.</t>
+
+        <t/>
+
+        <t/>
+      </section>
+    </section>
+
+    <section title="Configuration of ME6E-FP">
+      <t>Configuration of ME6E-FP require just three information, ME6 address
+      prefix, multiple Network plane ID, and prefix length of ME6E-FP route.
+      These information could explain just only one line, "&lt;ME6E-FP address
+      prefix&gt;&lt;multiple network plane ID&gt;/ prefix length of ME6E-FP
+      route".</t>
+
+      <t/>
+
+      <t/>
+    </section>
+
+    <section title="Characteristic">
+      <t>ME6E-FP has following useful characteristics.</t>
+
+      <t><list style="symbols">
+          <t>can operate unicast routing domain</t>
+
+          <t>TBD</t>
+        </list></t>
+
+      <t/>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA if using EtherIP Header.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>ME6E-FP use automatic tunneling technologies. Security consideration
+      related tunneling technologies are discussed in <xref
+      target="RFC2893">RFC2893</xref>, <xref target="RFC2267">RFC2267</xref>,
+      etc.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.3587.xml'?>
+
+      <reference anchor="I-D.matsuhira-me6a">
+        <front>
+          <title>Multiple Ethernet - IPv6 mapped IPv6 address (ME6A)</title>
+
+          <author fullname="N. Matsuhira" initials="N" surname="Matsuhira">
+            <organization>XX</organization>
+          </author>
+
+          <date day="1" month="June" year="2019"/>
+        </front>
+      </reference>
+
+      <?rfc ?>
+    </references>
+
+    <references>
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2893.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2267.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2080.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2740.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.5308.xml'?>
+
+      <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.3378.xml'?>
+
+      <?rfc ?>
+    </references>
+  </back>
+</rfc>
